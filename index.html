@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A bilingual scenario simulator for the Carbon Navigator WeChat Mini Program advertising funnel." />
+  <title>碳行家广告实验模拟器 | Carbon Navigator Ad Experiment Simulator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">C</div>
+      <div>
+        <h1 data-i18n="app.title"></h1>
+        <div class="sub" data-i18n="app.subtitle"></div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <label class="language-control">
+        <span data-i18n="language.label"></span>
+        <select id="languageMode" aria-label="Language mode">
+          <option value="bi" data-i18n="language.bi"></option>
+          <option value="zh" data-i18n="language.zh"></option>
+          <option value="en" data-i18n="language.en"></option>
+        </select>
+      </label>
+      <button class="btn ghost" id="presetBaseline" data-i18n="action.loadBaseline"></button>
+      <button class="btn" id="exportBtn" data-i18n="action.export"></button>
+      <button class="btn" id="importBtn" data-i18n="action.import"></button>
+      <input type="file" id="importFile" accept="application/json" class="hidden" />
+      <button class="btn primary" id="runBtnTop" data-i18n="action.resimulate"></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="notice"><b data-i18n="notice.important"></b> <span data-i18n="notice.body"></span></div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-panel="sim" data-i18n="tab.simulator"></button>
+    <button class="tab" data-panel="baseline" data-i18n="tab.baseline"></button>
+    <button class="tab" data-panel="compare" data-i18n="tab.compare"></button>
+    <button class="tab" data-panel="method" data-i18n="tab.method"></button>
+  </div>
+
+  <section id="sim" class="panel active">
+    <div class="grid">
+      <aside class="card left-card">
+        <div class="card-hd"><h2 data-i18n="params.title"></h2><span class="tag assumed" data-i18n="tag.editable"></span></div>
+        <div class="card-bd">
+          <div class="section-title" data-i18n="params.adPlan"></div>
+          <div class="row">
+            <div class="field">
+              <label data-i18n="field.planType"></label>
+              <select id="objective">
+                <option value="brand" data-i18n="option.brand"></option>
+                <option value="growth" data-i18n="option.growth"></option>
+                <option value="mixed" data-i18n="option.mixed"></option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="field.optimizationEvent"></label>
+              <select id="optimization">
+                <option value="click" data-i18n="option.clickOpen"></option>
+                <option value="consent" data-i18n="option.consent"></option>
+                <option value="entry" data-i18n="option.entryComplete"></option>
+                <option value="complete" data-i18n="option.allComplete"></option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field"><label data-i18n="field.totalBudget"></label><div class="suffix"><input class="input" id="budget" type="number" min="1" step="100" value="10000"><span data-i18n="unit.yuan"></span></div></div>
+            <div class="field"><label data-i18n="field.days"></label><div class="suffix"><input class="input" id="days" type="number" min="1" max="60" value="4"><span data-i18n="unit.day"></span></div></div>
+          </div>
+          <div class="row">
+            <div class="field"><label><span data-i18n="field.dailyBudget"></span><span class="help" data-i18n="help.zeroUnlimited"></span></label><div class="suffix"><input class="input" id="dailyBudget" type="number" min="0" step="100" value="0"><span data-i18n="unit.yuan"></span></div></div>
+            <div class="field"><label data-i18n="field.bid"></label><div class="suffix"><input class="input" id="bid" type="number" min="0.1" step="0.5" value="10"><span data-i18n="unit.yuan"></span></div></div>
+          </div>
+
+          <div class="section-title" data-i18n="params.placementTargeting"></div>
+          <div class="chips" id="placements">
+            <button class="chip active" data-value="moments" data-i18n="placement.moments"></button>
+            <button class="chip" data-value="search" data-i18n="placement.search"></button>
+            <button class="chip" data-value="video" data-i18n="placement.video"></button>
+            <button class="chip" data-value="public" data-i18n="placement.public"></button>
+            <button class="chip" data-value="network" data-i18n="placement.network"></button>
+          </div>
+          <div class="switch-group">
+            <div class="switch-line"><span data-i18n="switch.smartPlacement"></span><label class="switch"><input id="smartPlacement" type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="switch-line"><span data-i18n="switch.searchExpansion"></span><label class="switch"><input id="searchExpand" type="checkbox"><span class="slider"></span></label></div>
+            <div class="switch-line"><span data-i18n="switch.targetExpansion"></span><label class="switch"><input id="targetExpand" type="checkbox"><span class="slider"></span></label></div>
+          </div>
+          <div class="field field-spaced"><label><span data-i18n="field.audienceFit"></span><span class="help" data-i18n="help.audienceFit"></span></label><div class="range-wrap"><input id="audienceFit" type="range" min="50" max="150" value="100"><span class="range-value" id="audienceFitVal">100%</span></div></div>
+          <div class="field"><label><span data-i18n="field.creativeFit"></span><span class="help" data-i18n="help.creativeFit"></span></label><div class="range-wrap"><input id="creativeFit" type="range" min="50" max="150" value="100"><span class="range-value" id="creativeFitVal">100%</span></div></div>
+
+          <div class="section-title" data-i18n="params.landingRewards"></div>
+          <div class="row">
+            <div class="field"><label data-i18n="field.entryQuestions"></label><input class="input" id="questions" type="number" min="1" max="40" value="10"></div>
+            <div class="field"><label data-i18n="field.rewardCompleter"></label><div class="suffix"><input class="input" id="rewardComplete" type="number" min="0" step="0.1" value="6.42"><span data-i18n="unit.yuan"></span></div></div>
+          </div>
+          <div class="row">
+            <div class="field"><label data-i18n="field.rewardDropout"></label><div class="suffix"><input class="input" id="rewardDrop" type="number" min="0" step="0.1" value="0.59"><span data-i18n="unit.yuan"></span></div></div>
+            <div class="field"><label data-i18n="field.targetSample"></label><input class="input" id="targetN" type="number" min="1" value="700"></div>
+          </div>
+          <div class="switch-line"><span data-i18n="switch.progressDesign"></span><label class="switch"><input id="progressDesign" type="checkbox"><span class="slider"></span></label></div>
+          <div class="switch-line"><span data-i18n="switch.deepEvent"></span><label class="switch"><input id="deepEvent" type="checkbox"><span class="slider"></span></label></div>
+
+          <div class="divider"></div>
+          <div class="section-title" data-i18n="params.advanced"></div>
+          <div class="tiny" data-i18n="advanced.explain"></div>
+          <div class="field field-spaced"><label data-i18n="field.parameterMode"></label><select id="rateMode"><option value="auto" data-i18n="option.auto"></option><option value="manual" data-i18n="option.manual"></option></select></div>
+          <div id="manualRates" class="hidden">
+            <div class="row"><div class="field"><label data-i18n="field.avgCpc"></label><input class="input" id="mCpc" type="number" step="0.01" value="5.86"></div><div class="field"><label data-i18n="field.ctr"></label><input class="input" id="mCtr" type="number" step="0.1" value="21.8"></div></div>
+            <div class="row"><div class="field"><label data-i18n="field.clickConsent"></label><input class="input" id="mConsent" type="number" step="0.1" value="7.55"></div><div class="field"><label data-i18n="field.consentEntry"></label><input class="input" id="mEntry" type="number" step="0.1" value="65.9"></div></div>
+            <div class="row"><div class="field"><label data-i18n="field.entryFinish"></label><input class="input" id="mComplete" type="number" step="0.1" value="82.35"></div><div class="field"><label data-i18n="field.finishQuality"></label><input class="input" id="mQuality" type="number" step="0.1" value="80"></div></div>
+          </div>
+          <div class="assumption" id="assumptionText"></div>
+          <button class="btn primary run-wide" id="runBtn" data-i18n="action.runMonteCarlo"></button>
+        </div>
+      </aside>
+
+      <div>
+        <div class="card">
+          <div class="card-hd"><h2 data-i18n="results.title"></h2><div><span class="tag observed" data-i18n="tag.calibrated"></span> <span class="tag assumed" data-i18n="tag.forecast"></span></div></div>
+          <div class="card-bd">
+            <div class="kpi-grid">
+              <div class="kpi"><div class="label" data-i18n="kpi.impressions"></div><div class="value" id="kImpressions">-</div><div class="delta" id="dImpressions"></div></div>
+              <div class="kpi"><div class="label" data-i18n="kpi.clicks"></div><div class="value" id="kClicks">-</div><div class="delta" id="dClicks"></div></div>
+              <div class="kpi"><div class="label" data-i18n="kpi.consents"></div><div class="value" id="kConsent">-</div><div class="delta" id="dConsent"></div></div>
+              <div class="kpi"><div class="label" data-i18n="kpi.completers"></div><div class="value" id="kComplete">-</div><div class="delta" id="dComplete"></div></div>
+              <div class="kpi"><div class="label" data-i18n="kpi.realCac"></div><div class="value" id="kCac">-</div><div class="delta" id="dCac"></div></div>
+            </div>
+            <div class="results-grid">
+              <div class="chart-card"><div class="chart-title"><span data-i18n="chart.funnel"></span><span class="chart-sub" data-i18n="chart.median"></span></div><svg id="funnel" viewBox="0 0 760 330" preserveAspectRatio="xMidYMid meet"></svg></div>
+              <div class="chart-card"><div class="chart-title"><span data-i18n="chart.interval"></span><span class="chart-sub">P10–P90</span></div><div class="intervals" id="intervals"></div>
+                <div class="explain"><div class="formula-row"><span data-i18n="metric.adSpend"></span><b id="xSpend">-</b></div><div class="formula-row"><span data-i18n="metric.rewardSpend"></span><b id="xReward">-</b></div><div class="formula-row"><span data-i18n="metric.qualityCac"></span><b id="xQualityCac">-</b></div><div class="formula-row"><span data-i18n="metric.targetBudget"></span><b id="xNeededBudget">-</b></div><div class="formula-row"><span data-i18n="metric.completionRate"></span><b id="xCompletionRate">-</b></div></div>
+              </div>
+            </div>
+            <div class="chart-card chart-spaced"><div class="chart-title"><span data-i18n="chart.rateChange"></span><span class="chart-sub" data-i18n="chart.inspectable"></span></div><div class="table-wrap"><table class="tbl"><thead><tr><th data-i18n="table.metric"></th><th data-i18n="table.baseline"></th><th data-i18n="table.assumption"></th><th data-i18n="table.driver"></th></tr></thead><tbody id="rateExplain"></tbody></table></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="baseline" class="panel">
+    <div class="baseline-grid">
+      <div class="card"><div class="card-hd"><h2 data-i18n="baseline.funnelTitle"></h2><span class="tag observed" data-i18n="tag.observed"></span></div><div class="card-bd"><div class="big-number">¥142.86</div><div class="tiny" data-i18n="baseline.cacExplain"></div><div class="metric-list"><div><span data-i18n="metric.adSpend"></span><b>¥10,000</b></div><div><span data-i18n="metric.impressions"></span><b>7,829</b></div><div><span data-i18n="metric.clicks"></span><b>1,708</b></div><div><span data-i18n="metric.consents"></span><b>129</b></div><div><span data-i18n="metric.entryComplete"></span><b>85</b></div><div><span data-i18n="metric.finalComplete"></span><b>70</b></div></div></div></div>
+      <div class="card"><div class="card-hd"><h2 data-i18n="baseline.leakTitle"></h2><span class="tag risk" data-i18n="tag.priority"></span></div><div class="card-bd"><div class="big-number">−37%</div><div class="tiny" data-i18n="baseline.leakExplain"></div><div class="metric-list"><div><span data-i18n="metric.clickConsent"></span><b>7.55%</b></div><div><span data-i18n="metric.consentEntry"></span><b>65.9%</b></div><div><span data-i18n="metric.entryFinish"></span><b>82.35%</b></div><div><span data-i18n="metric.clickFinish"></span><b>4.10%</b></div><div><span data-i18n="metric.consentFinish"></span><b>54.3%</b></div></div></div></div>
+      <div class="card"><div class="card-hd"><h2 data-i18n="baseline.causalityTitle"></h2></div><div class="card-bd"><p class="body-copy" data-i18n="baseline.causalityBody"></p><div class="assumption"><b data-i18n="baseline.conclusion"></b> <span data-i18n="baseline.conclusionBody"></span></div></div></div>
+      <div class="card"><div class="card-hd"><h2 data-i18n="baseline.nextTestTitle"></h2></div><div class="card-bd"><div class="metric-list"><div><span data-i18n="test.groupA"></span><b data-i18n="test.groupAValue"></b></div><div><span data-i18n="test.groupB"></span><b data-i18n="test.groupBValue"></b></div><div><span data-i18n="test.controls"></span><b data-i18n="test.controlsValue"></b></div><div><span data-i18n="test.primary"></span><b data-i18n="test.primaryValue"></b></div><div><span data-i18n="test.secondary"></span><b data-i18n="test.secondaryValue"></b></div></div><p class="tiny test-note" data-i18n="test.note"></p></div></div>
+    </div>
+  </section>
+
+  <section id="compare" class="panel">
+    <div class="card"><div class="card-hd"><h2 data-i18n="compare.title"></h2><div class="compare-actions"><button class="btn ghost" id="loadCompare" data-i18n="compare.load"></button><button class="btn primary" id="runCompare" data-i18n="compare.update"></button></div></div><div class="card-bd"><p class="tiny compare-note" data-i18n="compare.explain"></p><div class="table-wrap"><table class="tbl"><thead><tr><th data-i18n="compare.scenario"></th><th data-i18n="compare.budget"></th><th data-i18n="compare.clicks"></th><th data-i18n="compare.consents"></th><th data-i18n="compare.complete"></th><th data-i18n="compare.quality"></th><th data-i18n="compare.adCac"></th><th data-i18n="compare.totalCac"></th><th data-i18n="compare.note"></th></tr></thead><tbody id="compareBody"></tbody></table></div></div></div>
+  </section>
+
+  <section id="method" class="panel">
+    <div class="card"><div class="card-hd"><h2 data-i18n="method.title"></h2></div><div class="card-bd method-copy">
+      <h3 data-i18n="method.anchorTitle"></h3><p data-i18n="method.anchorBody"></p>
+      <h3 data-i18n="method.scenarioTitle"></h3><p data-i18n="method.scenarioBody"></p>
+      <h3 data-i18n="method.uncertaintyTitle"></h3><p data-i18n="method.uncertaintyBody"></p>
+      <h3 data-i18n="method.limitsTitle"></h3><p data-i18n="method.limitsBody"></p>
+      <h3 data-i18n="method.upgradeTitle"></h3><p data-i18n="method.upgradeBody"></p>
+      <h3 data-i18n="method.codeTitle"></h3><p data-i18n="method.codeBody"></p>
+    </div></div>
+  </section>
+
+  <div class="footer" data-i18n="footer"></div>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

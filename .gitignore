@@ -1,0 +1,14 @@
+.DS_Store
+.vscode/
+*.log
+*.csv
+*.jsonl
+*.xlsx
+*.pdf
+live-monitor*
+Carbon-Footprint-Mini-Program*
+participant*
+cloudbase*
+secrets*
+.env
+.env.*
